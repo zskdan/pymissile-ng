@@ -50,9 +50,35 @@ import os
 from time import sleep, time
 from socket import *
 
-vendor_product_ids = [(0x1130,0x0202)]
+vendor_product_ids = [(0x1130,0x0202),(0x0416, 0x9391)]
 
-class MissileDevice:
+class centerMissileDevice:
+  dev       = None
+  handle    = None
+  STOP      = 0x0
+  LEFT      = 0x8
+  RIGHT     = 0x4
+  UP        = 0x2
+  DOWN      = 0x1
+  LEFTUP    = LEFT + UP
+  RIGHTUP   = RIGHT + UP
+  LEFTDOWN  = LEFT + DOWN
+  RIGHTDOWN = RIGHT + DOWN
+  FIRE      = 0x10
+
+  def __init__(self,usbdevice):
+      try:
+        self.handle = usbdevice.open()
+        self.handle.reset()
+        return
+      except NoMissilesError, e:
+        raise NoMissilesError()
+
+  def move(self, direction):
+     self.handle.controlMsg(0x21, 0x09, [0x5f, direction, 0xe0, 0xff, 0xfe], 0x0300, 0x00)
+
+class legacyMissileDevice:
+  dev       = None
   INITA     = (85, 83, 66, 67,  0,  0,  4,  0)
   INITB     = (85, 83, 66, 67,  0, 64,  2,  0)
   CMDFILL   = ( 8,  8,
@@ -106,7 +132,12 @@ class UsbDevice:
             self.endpoints = []
             for endpoint in self.intf.endpoints:
               self.endpoints.append(endpoint)
-            return
+            if i == 0:
+              self.launcher = legacyMissileDevice
+              return
+            elif i == 1:
+              self.launcher = centerMissileDevice
+              return
           else:
             count=count+1
     raise NoMissilesError()
