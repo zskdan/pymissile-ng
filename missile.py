@@ -50,6 +50,8 @@ import os
 from time import sleep, time
 from socket import *
 
+vendor_product_ids = [(0x1130,0x0202)]
+
 class MissileDevice:
   INITA     = (85, 83, 66, 67,  0,  0,  4,  0)
   INITB     = (85, 83, 66, 67,  0, 64,  2,  0)
@@ -72,31 +74,32 @@ class MissileDevice:
   RIGHTDOWN = ( 0,  0,  1,  0,  1,  0)
   FIRE      = ( 0,  0,  0,  0,  0,  1)
 
-  def __init__(self, battery):
+  def __init__(self, usbdevice):
     try:
-      self.dev=UsbDevice(0x1130, 0x0202, battery)
-      self.dev.open()
-      self.dev.handle.reset()
+      self.handle = usbdevice.open()
+      self.handle.reset()
     except NoMissilesError, e:
       raise NoMissilesError()
 
   def move(self, direction):
-    self.dev.handle.controlMsg(0x21, 0x09, self.INITA, 0x02, 0x01)
-    self.dev.handle.controlMsg(0x21, 0x09, self.INITB, 0x02, 0x01)
-    self.dev.handle.controlMsg(0x21, 0x09, direction+self.CMDFILL, 0x02, 0x01)
+    self.handle.controlMsg(0x21, 0x09, self.INITA, 0x02, 0x01)
+    self.handle.controlMsg(0x21, 0x09, self.INITB, 0x02, 0x01)
+    self.handle.controlMsg(0x21, 0x09, direction+self.CMDFILL, 0x02, 0x01)
 
 class NoMissilesError(Exception): pass
 
 class UsbDevice:
-  def __init__(self, vendor_id, product_id, skip):
+  def __init__(self):
     busses = usb.busses()
     self.handle = None
+    self.launcher = None
     count = 0
     for bus in busses:
       devices = bus.devices
       for dev in devices:
+       for i, (vendor_id, product_id) in enumerate(vendor_product_ids):
         if dev.idVendor==vendor_id and dev.idProduct==product_id:
-          if count==skip:
+          if count==0:
             self.dev = dev
             self.conf = self.dev.configurations[0]
             self.intf = self.conf.interfaces[0][0]
@@ -108,6 +111,9 @@ class UsbDevice:
             count=count+1
     raise NoMissilesError()
 
+  def probe(self):
+      return self.launcher
+
   def open(self):
     if self.handle:
       self.handle = None
@@ -117,6 +123,7 @@ class UsbDevice:
     self.handle.setConfiguration(self.conf)
     self.handle.claimInterface(self.intf)
     self.handle.setAltInterface(self.intf)
+    return self.handle
 
 class MissileDisplay:
   palette = [ ('body', 'black', 'dark cyan', 'standout'),
@@ -159,10 +166,12 @@ class MissileDisplay:
     self.ui.run_wrapper(self.run)
 
   def run(self):
+    usbdevice = UsbDevice()
+    MissileDevice = usbdevice.probe()
     md = []
     for missiles in range(10):
       try:
-        md.append(MissileDevice(missiles))
+        md.append(MissileDevice(usbdevice))
       except NoMissilesError, e:
         break
     if missiles==0:
