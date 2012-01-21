@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 #
 #  Written by: Scott Weston <scott@weston.id.au>
+#  Edited  by: Zakaria ElQotbi <zakaria@elqotbi.com>
 #
 # - Version --------------------------------------------------------------
 #
-#  $Id: missile.py,v 1.13 2006/07/25 17:01:24 scott Exp $
+#  $Id: missile.py,v 2.0 2011/12/02 15:45:24 scott Exp $
 #
 # - License --------------------------------------------------------------
 #
@@ -36,49 +37,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-# - Change Log -----------------------------------------------------------
-#
-#  $Log: missile.py,v $
-#  Revision 1.13  2006/07/25 17:01:24  scott
-#  Bug fix (no default execution, missing usage text)
-#  as reported by: Petter Reinholdtsen
-#
-#  Revision 1.12  2006/07/07 18:23:20  scott
-#  comment out the noisey bits and leave it to users to enable if they so fit
-#
-#  Revision 1.11  2006/07/07 18:19:22  scott
-#  fix rcs history
-#
-#  Revision 1.10  2006/07/07 18:17:48  scott
-#  some fixes for better network control
-#
-#  Revision 1.9  2006/06/07 17:19:15  scott
-#  oops, forgot the -n in the usage
-#
-#  Revision 1.8  2006/06/07 17:17:36  scott
-#  added support for a -n network mode
-#  allows for control by simple udp packets
-#
-#  Revision 1.7  2006/05/29 13:27:54  scott
-#  added support for multiple missiles
-#
-#  Revision 1.6  2006/04/17 18:25:02  scott
-#  changed warning message for more comedic value
-#
-#  Revision 1.5  2006/03/17 15:39:21  scott
-#  added bsd license
-#
-#  Revision 1.4  2006/01/26 16:28:09  scott
-#  better exception handling
-#
-#  Revision 1.3  2006/01/26 15:03:01  scott
-#  added command line arguments (ready for more)
-#  cleaned up display class
-#
-#  Revision 1.2  2006/01/26 14:27:55  scott
-#  added more useful RCS tags
-#
-#
+
 import usb
 import exceptions
 import urwid
