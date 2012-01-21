@@ -116,11 +116,14 @@ class NoMissilesError(Exception): pass
 
 class UsbDevice:
   def __init__(self):
-    busses = usb.busses()
     self.handle = None
     self.launcher = None
+    self.dev = None
+    self.busses = usb.busses()
+
+  def probe(self):
     count = 0
-    for bus in busses:
+    for bus in self.busses:
       devices = bus.devices
       for dev in devices:
        for i, (vendor_id, product_id) in enumerate(vendor_product_ids):
@@ -134,16 +137,13 @@ class UsbDevice:
               self.endpoints.append(endpoint)
             if i == 0:
               self.launcher = legacyMissileDevice
-              return
+              return self.launcher
             elif i == 1:
               self.launcher = centerMissileDevice
-              return
+              return self.launcher
           else:
             count=count+1
     raise NoMissilesError()
-
-  def probe(self):
-      return self.launcher
 
   def open(self):
     if self.handle:
