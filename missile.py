@@ -401,6 +401,7 @@ def usage():
   print "Usage:"
   print "  -h | --help : this help"
   print "  -n | --network: simple network listener mode (Read the source Luke!)"
+  print "  -c | --console: read command directly from console (dont use urwid interface)"
   print "  -v | --version: version"
   sys.exit(2)
 
@@ -410,7 +411,7 @@ def version():
 
 def main(argv):
   try:
-    opts, args = getopt.getopt(argv, "hvn", ["help", "version", "network"])
+    opts, args = getopt.getopt(argv, "hvnc", ["help", "version", "network", "console"])
   except getopt.GetoptError:
     print "Sorry, bad option."
     usage()
@@ -427,6 +428,12 @@ def main(argv):
         except NoMissilesError, e:
           print "No WMDs found."
           return
+      elif o in ("-c", "--console"):
+        try:
+          MissileNoDisplay().run()
+        except NoMissilesError, e:
+          print "No WMDs found."
+          return
       else:
         try:
           MissileDisplay().main()
@@ -435,8 +442,7 @@ def main(argv):
           return
   else:
     try:
-      MissileNoDisplay().run()
-      #MissileDisplay().main()
+      MissileDisplay().main()
     except NoMissilesError, e:
       print "No WMDs found."
       return
