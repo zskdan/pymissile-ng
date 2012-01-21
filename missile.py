@@ -160,6 +160,67 @@ class UsbDevice:
     self.handle.setAltInterface(self.intf)
     return self.handle
 
+class MissileNoDisplay:
+  def run(self):
+    usbdevice = UsbDevice()
+    MissileDevice = usbdevice.probe()
+    md = []
+    for missiles in range(3):
+      try:
+        md.append(MissileDevice(usbdevice))
+      except NoMissilesError, e:
+        break
+    if missiles==0:
+      raise NoMissilesError
+    while 1:
+      keys = None
+      while not keys:
+        keys = raw_input("Enter something: ")
+      for k in keys:
+        if k == 'window resize':
+          size = self.ui.get_cols_rows()
+        elif k in ('w', 'up'):
+          for m in md:
+            m.move(MissileDevice.UP)
+        elif k in ('x', 'down'):
+          for m in md:
+            m.move(MissileDevice.DOWN)
+        elif k in ('a', 'left'):
+          for m in md:
+            m.move(MissileDevice.LEFT)
+        elif k in ('d', 'right'):
+          for m in md:
+            m.move(MissileDevice.RIGHT)
+        elif k in ('f', 'space'):
+          for m in md:
+            m.move(MissileDevice.FIRE)
+        elif k in ('s'):
+          for m in md:
+            m.move(MissileDevice.STOP)
+        elif k in ('q'):
+          for m in md:
+            m.move(MissileDevice.LEFTUP)
+        elif k in ('e'):
+          for m in md:
+            m.move(MissileDevice.RIGHTUP)
+        elif k in ('z'):
+          for m in md:
+            m.move(MissileDevice.LEFTDOWN)
+        elif k in ('c'):
+          for m in md:
+            m.move(MissileDevice.RIGHTDOWN)
+        elif k in ('r'):
+          for n in range(3):
+            for m in md:
+              m.move(MissileDevice.FIRE)
+              sleep(0.5)
+        elif k in ('v'):
+          for m in md:
+            if  random.random() > 0.8:
+              m.move(MissileDevice.FIRE)
+        elif k in ('esc'):
+          return
+
 class MissileDisplay:
   palette = [ ('body', 'black', 'dark cyan', 'standout'),
               ('footer','light gray', 'dark blue'),
@@ -405,7 +466,7 @@ def main(argv):
           return
   else:
     try:
-      MissileDisplay().main()
+      MissileNoDisplay().run()
     except NoMissilesError, e:
       print "No WMDs found."
       return
