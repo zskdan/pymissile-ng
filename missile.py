@@ -149,8 +149,12 @@ class UsbDevice:
     if self.handle:
       self.handle = None
     self.handle = self.dev.open()
-    self.handle.detachKernelDriver(0)
-    self.handle.detachKernelDriver(1)
+    try:
+      self.handle.detachKernelDriver(0)
+      self.handle.detachKernelDriver(1)
+    except usb.USBError, err:
+      print >> sys.stderr, err
+
     self.handle.setConfiguration(self.conf)
     self.handle.claimInterface(self.intf)
     self.handle.setAltInterface(self.intf)
